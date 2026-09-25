@@ -120,6 +120,53 @@ class PresenceControllerIntegrationTest {
                 .andExpect(jsonPath("$.code").value("TROP_DE_TENTATIVES"));
     }
 
+    /** Issue #4, EF7/RG8 : le formateur ajoute une presence sans code. */
+    @Test
+    void ajoute_une_presence_manuelle_source_formateur() throws Exception {
+        mockMvc.perform(post("/api/sessions/{id}/presences-manuelles", sessionRepository.findByCode(codeValide).get().getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"etudiantId\":1}"))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.source").value("FORMATEUR"))
+                .andExpect(jsonPath("$.etudiantId").value(1));
+    }
+
+    @Test
+    void refuse_une_presence_manuelle_si_deja_present_avec_409() throws Exception {
+        Long sessionId = sessionRepository.findByCode(codeValide).get().getId();
+
+        mockMvc.perform(post("/api/sessions/{id}/presences-manuelles", sessionId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"etudiantId\":3}"))
+                .andExpect(status().isCreated());
+
+        mockMvc.perform(post("/api/sessions/{id}/presences-manuelles", sessionId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"etudiantId\":3}"))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.code").value("DEJA_PRESENT"));
+    }
+
+    @Test
+    void refuse_une_presence_manuelle_pour_une_session_inconnue_avec_404() throws Exception {
+        mockMvc.perform(post("/api/sessions/{id}/presences-manuelles", 999_999)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"etudiantId\":1}"))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.code").value("SESSION_INCONNUE"));
+    }
+
+    @Test
+    void refuse_une_presence_manuelle_pour_un_etudiant_inconnu_avec_404() throws Exception {
+        Long sessionId = sessionRepository.findByCode(codeValide).get().getId();
+
+        mockMvc.perform(post("/api/sessions/{id}/presences-manuelles", sessionId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"etudiantId\":999999}"))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.code").value("ETUDIANT_INCONNU"));
+    }
+
     /**
      * Issue #37 : deux requetes quasi simultanees pour le meme etudiant/session
      * (double clic, double onglet) ne doivent jamais produire un 500 -
