@@ -38,3 +38,6 @@ pnpm-debug.log*
 *.pid
 *.seed
 *.pid.lock
+
+# --- Coordination interne agents (hors livrables) ---
+.suivi/
