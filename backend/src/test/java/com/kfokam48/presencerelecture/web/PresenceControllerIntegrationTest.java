@@ -142,7 +142,7 @@ class PresenceControllerIntegrationTest {
                     depart.await();
                     int statut = mockMvc.perform(post("/api/presences")
                                     .contentType(MediaType.APPLICATION_JSON)
-                                    .content("{\"code\":\"" + codeValide + "\",\"etudiantId\":5}"))
+                                    .content("{\"code\":\"" + codeValide + "\",\"etudiantId\":2}"))
                             .andReturn().getResponse().getStatus();
                     statuts.add(statut);
                 } catch (Exception e) {

@@ -8,6 +8,7 @@ import com.kfokam48.presencerelecture.domain.exception.DejaPresentException;
 import com.kfokam48.presencerelecture.domain.exception.TropDeTentativesException;
 import com.kfokam48.presencerelecture.repository.PresenceRepository;
 import com.kfokam48.presencerelecture.repository.SessionRepository;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -52,7 +53,15 @@ public class PresenceService {
         }
 
         Presence presence = new Presence(clock.instant(), Presence.Source.ETUDIANT, session.getId(), etudiantId);
-        presence = presenceRepository.save(presence);
+        try {
+            presence = presenceRepository.save(presence);
+        } catch (DataIntegrityViolationException e) {
+            // Issue #37 : deux requetes concurrentes passent toutes les deux le
+            // check exists() avant que l'une des deux n'ait commit - la
+            // contrainte uq_presence_session_etudiant protege l'integrite,
+            // on traduit sa violation en 409 propre plutot que 500.
+            throw new DejaPresentException();
+        }
         tentativesCodeTracker.reinitialiser(etudiantId);
         return presence;
     }
