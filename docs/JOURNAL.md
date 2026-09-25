@@ -24,11 +24,9 @@ Chaque entrée répond aux trois mêmes questions :
 
 ## Étape 2 — Première version
 
-**Fait :**
-
-**Bloqué :**
-
-**IA :**
+**Fait :** Initialisation du Front-end avec React/Vite (TS). Création de la couche de services (`api.ts`) et de l'intercepteur de mock. Implémentation des 3 écrans (Étudiant, Relecteur, Formateur) sur leurs propres branches (`feature/9`, `11`, `10`) avec gestion stricte des erreurs, du chargement et intégration dans `App.tsx`.
+**Bloqué :** `npm create vite` plantait à cause de la version de Node imposée par l'environnement (18.x) qui ne supportait pas la version la plus récente de `create-vite`. Contourné en forçant Vite v5.
+**IA :** Antigravity a généré les 3 écrans en respectant les contraintes (couche API dédiée, F3, etc.). La conformité a été vérifiée en s'assurant que l'écran étudiant n'expose jamais le nom du relecteur (RG10) et que le formateur ne calcule pas les moyennes localement.
 
 ---
 
