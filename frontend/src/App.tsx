@@ -3,36 +3,55 @@ import EcranEtudiant from './components/Etudiant/EcranEtudiant';
 import EcranFormateur from './components/Formateur/EcranFormateur';
 import EcranRelecteur from './components/Relecteur/EcranRelecteur';
 
+type Role = 'FORMATEUR' | 'ETUDIANT' | 'RELECTEUR' | null;
+
 function App() {
-  const [role, setRole] = useState<'FORMATEUR' | 'ETUDIANT' | 'RELECTEUR'>('ETUDIANT');
+  const [role, setRole] = useState<Role>(null);
+
+  if (!role) {
+    return (
+      <div className="login-container">
+        <div className="login-card">
+          <h1 className="login-title">
+            Bienvenue sur <span style={{ color: 'var(--primary)' }}>Présence & Relecture</span>
+          </h1>
+          <p className="login-subtitle">Sélectionnez votre profil pour continuer</p>
+          
+          <div className="role-buttons">
+            <button className="role-btn formateur" onClick={() => setRole('FORMATEUR')}>
+              <span className="role-icon">👨‍🏫</span>
+              <span className="role-text">Je suis Formateur</span>
+              <span className="role-desc">Créer des sessions et voir le tableau de bord</span>
+            </button>
+            
+            <button className="role-btn etudiant" onClick={() => setRole('ETUDIANT')}>
+              <span className="role-icon">🎓</span>
+              <span className="role-text">Je suis Étudiant</span>
+              <span className="role-desc">Marquer ma présence et déposer mon travail</span>
+            </button>
+            
+            <button className="role-btn relecteur" onClick={() => setRole('RELECTEUR')}>
+              <span className="role-icon">✍️</span>
+              <span className="role-text">Je suis Relecteur</span>
+              <span className="role-desc">Évaluer le travail d'un autre étudiant</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="app-container">
-      <h1 style={{ textAlign: 'center', marginBottom: '2rem', fontSize: '2rem' }}>
-        Épreuve Finale <span style={{ color: 'var(--primary)' }}>KFOKAM48</span>
-      </h1>
+      <header className="app-header">
+        <h1 style={{ margin: 0, fontSize: '1.5rem' }}>
+          Plateforme <span style={{ color: 'var(--primary)' }}>KFOKAM48</span>
+        </h1>
+        <button className="btn btn-outline" onClick={() => setRole(null)}>
+          🚪 Déconnexion
+        </button>
+      </header>
       
-      <div className="tabs-container">
-        <button 
-          className={`tab-button ${role === 'FORMATEUR' ? 'active' : ''}`}
-          onClick={() => setRole('FORMATEUR')} 
-        >
-          👨‍🏫 Vue Formateur
-        </button>
-        <button 
-          className={`tab-button ${role === 'ETUDIANT' ? 'active' : ''}`}
-          onClick={() => setRole('ETUDIANT')} 
-        >
-          🎓 Vue Étudiant
-        </button>
-        <button 
-          className={`tab-button ${role === 'RELECTEUR' ? 'active' : ''}`}
-          onClick={() => setRole('RELECTEUR')} 
-        >
-          ✍️ Vue Relecteur
-        </button>
-      </div>
-
       <main>
         {role === 'FORMATEUR' && <EcranFormateur />}
         {role === 'ETUDIANT' && <EcranEtudiant />}
