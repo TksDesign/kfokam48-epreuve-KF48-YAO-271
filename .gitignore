@@ -33,6 +33,10 @@ pnpm-debug.log*
 .vscode/
 *.iml
 .DS_Store
+.settings/
+.project
+.classpath
+bin/
 
 # --- Docker / divers ---
 *.pid
