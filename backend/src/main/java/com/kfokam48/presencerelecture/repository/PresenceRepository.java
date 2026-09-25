@@ -9,6 +9,8 @@ import java.util.List;
 public interface PresenceRepository extends JpaRepository<Presence, Long> {
     boolean existsBySessionIdAndEtudiantId(Long sessionId, Long etudiantId);
 
+    long countByEtudiantId(Long etudiantId);
+
     /** RG4 : candidats relecteurs = etudiants presents a la session, hors l'auteur. */
     @Query("select distinct p.etudiantId from Presence p where p.sessionId = :sessionId and p.etudiantId <> :auteurId")
     List<Long> trouverEtudiantsPresentsHorsAuteur(Long sessionId, Long auteurId);
