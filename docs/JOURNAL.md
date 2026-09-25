@@ -34,13 +34,13 @@ Chaque entrée répond aux trois mêmes questions :
 
 ## Étape 3 — Enveloppe
 
-**Fait :**
+**Fait :** Enveloppe récupérée après `[JALON] v0.1`, deux sujets traités en parallèle sur deux branches séparées. **Bug** (course concurrente sur `POST /api/presences`) : traduit le signalement client en scénario technique (check-then-act non atomique sur `existsBySessionIdAndEtudiantId` + `save`), issue #37 ouverte avant tout code, test qui échoue committé en premier (`[201, 500]` prouvé), fix dans un commit séparé référençant l'issue (`DataIntegrityViolationException` → 409 `DEJA_PRESENT`), PR #41 mergée. **Changement de besoin** (double relecteur, RG9→RG12/RG13) : analyse mise à jour en premier (CDC §6/§7bis, D2, D4) dans un commit dédié sans code, contrat d'API mis à jour, migration `V3` ajoutée (V1/V2 intactes, backfill des données existantes), travail découpé en 3 issues (#38 migration, #39 assignation, #40 rendu+moyenne+provisoire), PR #42 mergée séparément de la PR bug. 54/54 tests après les deux merges, migration testée en conditions réelles (Testcontainers).
 
-**Bloqué :**
+**Bloqué :** en testant le rôle relecteur, découverte d'un deuxième bug (pas dans l'enveloppe) : la "mise en file d'attente" documentée en CDC §7 (exercice sans candidat présent) n'a en réalité jamais été implémentée — un exercice sans relecteur au dépôt reste orphelin indéfiniment. Décision : pas de fix isolé, absorbé dans le refactor RG12 (la logique d'assignation était de toute façon réécrite), documenté en CDC §7bis plutôt que caché.
 
-**IA :**
+**IA :** Claude a traduit les deux signalements client (verbatim, non techniques) en scénarios reproductibles, en s'appuyant sur la lecture directe du code (`PresenceService`, `ExerciceService`) plutôt que sur des suppositions. Vérifié par exécution réelle : le test de course a d'abord démontré le bug (`[201, 500]`), la migration `V3` a été appliquée sur une vraie base Postgres via Testcontainers (pas juste relue), et l'ensemble de la suite (54 tests) a tourné après chaque merge pour confirmer `main` sain.
 
-**Ce que j'ai sorti du périmètre pour absorber le changement, et pourquoi :**
+**Ce que j'ai sorti du périmètre pour absorber le changement, et pourquoi :** réassignation différée d'un relecteur (quand un candidat manquant marque présence après coup) — reste non implémentée, comme avant le changement ; demande un déclencheur asynchrone hors du scope synchrone du reste de l'API, et le client ne l'a pas demandé explicitement. Notifications/rappel au relecteur qui n'a pas rendu sa note — non demandé, le client veut juste voir la note provisoire. Habillage visuel frontend (badge "provisoire" vs "finale") — sacrifié en premier si le temps manque, sans impact sur la correction backend qui est ce qui est noté à cette étape.
 
 ---
 
