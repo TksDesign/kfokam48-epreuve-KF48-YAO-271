@@ -20,7 +20,7 @@
 | | |
 |---|---|
 | Dépôt (public) | `https://github.com/TksDesign/kfokam48-epreuve-KF48-YAO-271` |
-| Commit final — hash complet, 40 caractères | `48db4ffcf5fb0bb46978da0eb35f3a1511068421` |
+| Commit final — hash complet, 40 caractères | `942b40778ecb738ecf2296264f31213835a0c7e6` |
 | Branche | `main` |
 
 ## Technique
