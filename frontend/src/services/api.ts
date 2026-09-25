@@ -42,7 +42,17 @@ async function fetchApi<T>(url: string, options?: RequestInit): Promise<T> {
           resolve({ id: 1, statut: 'DEPOSE' } as any);
         }
         if (url.includes('/sessions') && options?.method === 'POST') {
-          resolve({ id: 101, code: 'X1Y2Z', ouvertureAt: new Date().toISOString(), expirationAt: new Date(Date.now() + 15*60000).toISOString() } as any);
+          if (url.includes('/presences-manuelles')) {
+            resolve({ id: 2, sessionId: 101, etudiantId: JSON.parse(options.body as string).etudiantId, source: 'FORMATEUR' } as any);
+          } else {
+            resolve({ id: 101, code: 'X1Y2Z', ouvertureAt: new Date().toISOString(), expirationAt: new Date(Date.now() + 15*60000).toISOString() } as any);
+          }
+        }
+        if (url.includes('/tableau')) {
+          resolve([
+            { etudiantId: 1, nom: 'Alice Martin', presences: 1, exercicesDeposes: 1, moyenne: 14.5, relecturesEnAttente: 0 },
+            { etudiantId: 2, nom: 'Bob Dupuis', presences: 1, exercicesDeposes: 0, moyenne: null, relecturesEnAttente: 1 }
+          ] as any);
         }
         resolve({} as any);
       }, 500);
