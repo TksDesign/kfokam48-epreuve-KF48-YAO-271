@@ -29,7 +29,16 @@ services:
       db:
         condition: service_healthy
 
-  # frontend: ajoute une fois le Dockerfile React pret (antigravity)
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        VITE_API_BASE_URL: http://localhost:8080/api
+        VITE_USE_MOCKS: "false"
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
 
 volumes:
   db_data:
