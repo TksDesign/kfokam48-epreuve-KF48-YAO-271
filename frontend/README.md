@@ -1,50 +1,36 @@
-# React + TypeScript + Vite
+# Épreuve Finale KFOKAM48 — Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+**Framework choisi :** React (avec Vite), car il permet de développer rapidement des interfaces déclaratives avec une gestion d'état simple pour nos trois écrans, tout en offrant un écosystème très robuste.
 
-Currently, two official plugins are available:
+## Démarrage rapide
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+Assurez-vous d'avoir Node.js (version 18+) installé.
 
-## Expanding the ESLint configuration
+1. **Installer les dépendances :**
+   ```bash
+   npm install
+   ```
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+2. **Lancer l'application en mode développement :**
+   ```bash
+   npm run dev
+   ```
 
-- Configure the top-level `parserOptions` property like this:
+3. **Générer le build de production (validation) :**
+   ```bash
+   npm run build
+   ```
 
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+*L'application sera accessible sur `http://localhost:5173`.*
+
+## Configuration API
+Par défaut, le frontend utilise des **Mocks**.
+Pour se connecter au vrai backend Spring Boot (qui tourne sur `http://localhost:8080`), modifiez le fichier `.env.local` (ou vos variables d'environnement) avec :
+
+```env
+VITE_USE_MOCKS=false
+VITE_API_BASE_URL=http://localhost:8080/api
 ```
 
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
-
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
-
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
-```
+## Données de démonstration
+Une fois branché au vrai backend, une promotion par défaut (Promo 2026) et des étudiants (Alice, Bob, Charlie) sont injectés automatiquement via le système de migration du backend pour permettre de tester immédiatement les fonctionnalités sans base vide.

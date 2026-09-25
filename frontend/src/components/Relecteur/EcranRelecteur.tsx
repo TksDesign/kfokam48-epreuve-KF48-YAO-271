@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { api } from '../../services/api';
 
 export default function EcranRelecteur() {
+  const [relecteurId, setRelecteurId] = useState<number | ''>('');
   const [exerciceId, setExerciceId] = useState<number | ''>('');
   const [note, setNote] = useState<number | ''>('');
   const [commentaire, setCommentaire] = useState('');
@@ -10,7 +11,13 @@ export default function EcranRelecteur() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
 
-  // Mock list d'exercices à relire
+  // Mocks pour Q1 et les exercices
+  const etudiantsMocks = [
+    { id: 1, nom: 'Alice Martin' },
+    { id: 2, nom: 'Bob Dupuis' },
+    { id: 3, nom: 'Charlie Legrand' },
+  ];
+
   const exercicesMocks = [
     { id: 1, lien: 'https://github.com/exo1' },
     { id: 2, lien: 'https://github.com/exo2' },
@@ -18,14 +25,14 @@ export default function EcranRelecteur() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!exerciceId || note === '' || !commentaire) return;
+    if (!relecteurId || !exerciceId || note === '' || !commentaire) return;
 
     setLoading(true);
     setError(null);
     setSuccess(false);
 
     try {
-      await api.rendreRelecture(Number(exerciceId), Number(note), commentaire);
+      await api.rendreRelecture(Number(exerciceId), Number(note), commentaire, Number(relecteurId));
       setSuccess(true);
     } catch (err: any) {
       setError(err.message || 'Erreur lors de l\'envoi de la relecture');
@@ -47,6 +54,20 @@ export default function EcranRelecteur() {
           </div>
         ) : (
           <form onSubmit={handleSubmit}>
+            <div style={{ marginBottom: '1rem' }}>
+              <label>Qui êtes-vous ? </label>
+              <select 
+                value={relecteurId} 
+                onChange={e => setRelecteurId(e.target.value ? Number(e.target.value) : '')}
+                required
+              >
+                <option value="">-- Choisir mon nom --</option>
+                {etudiantsMocks.map(e => (
+                  <option key={e.id} value={e.id}>{e.nom}</option>
+                ))}
+              </select>
+            </div>
+
             <div style={{ marginBottom: '1rem' }}>
               <label>Exercice assigné : </label>
               <select 
