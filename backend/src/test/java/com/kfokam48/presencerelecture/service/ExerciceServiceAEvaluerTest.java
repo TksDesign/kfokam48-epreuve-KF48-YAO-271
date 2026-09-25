@@ -38,7 +38,7 @@ class ExerciceServiceAEvaluerTest {
     void retourne_les_exercices_en_attente_assignes_au_relecteur() {
         Exercice exercice = new Exercice("https://example.com/exo", 1L, 10L);
         exercice.assignerRelecteur(20L);
-        when(exerciceRepository.findByRelecteurIdAndStatut(20L, Exercice.Statut.EN_ATTENTE))
+        when(exerciceRepository.findAEvaluerPour(20L, Exercice.Statut.EN_ATTENTE))
                 .thenReturn(List.of(exercice));
 
         List<ExerciceAEvaluerResponse> resultat = creerService().aEvaluerPour(20L);
@@ -49,8 +49,21 @@ class ExerciceServiceAEvaluerTest {
     }
 
     @Test
+    void retourne_les_exercices_assignes_au_deuxieme_relecteur_aussi() {
+        Exercice exercice = new Exercice("https://example.com/exo", 1L, 10L);
+        exercice.assignerRelecteurs(20L, 30L);
+        when(exerciceRepository.findAEvaluerPour(30L, Exercice.Statut.EN_ATTENTE))
+                .thenReturn(List.of(exercice));
+
+        List<ExerciceAEvaluerResponse> resultat = creerService().aEvaluerPour(30L);
+
+        assertThat(resultat).hasSize(1);
+        assertThat(resultat.get(0).id()).isEqualTo(exercice.getId());
+    }
+
+    @Test
     void liste_vide_si_rien_a_evaluer() {
-        when(exerciceRepository.findByRelecteurIdAndStatut(99L, Exercice.Statut.EN_ATTENTE))
+        when(exerciceRepository.findAEvaluerPour(99L, Exercice.Statut.EN_ATTENTE))
                 .thenReturn(List.of());
 
         assertThat(creerService().aEvaluerPour(99L)).isEmpty();
