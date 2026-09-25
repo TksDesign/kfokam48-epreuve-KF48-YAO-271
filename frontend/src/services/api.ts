@@ -20,6 +20,19 @@ export interface Exercice {
   statut: string;
 }
 
+export interface ExerciceAEvaluer {
+  id: number;
+  lien: string;
+}
+
+export interface MonExercice {
+  id: number;
+  lien: string;
+  statut: string;
+  note: number | null;
+  commentaire: string | null;
+}
+
 export interface ApiError {
   code: string;
   message: string;
@@ -39,7 +52,16 @@ async function fetchApi<T>(url: string, options?: RequestInit): Promise<T> {
           if (body.code === 'EXPIRE') return reject({ code: 'CODE_EXPIRE', message: 'Le code a expiré' });
           resolve({ id: 1, sessionId: 101, etudiantId: body.etudiantId, source: 'ETUDIANT' } as any);
         }
-        if (url.includes('/exercices')) {
+        if (url.includes('/exercices/a-evaluer')) {
+          resolve([
+            { id: 1, lien: 'https://github.com/exo1' },
+            { id: 2, lien: 'https://github.com/exo2' },
+          ] as any);
+        } else if (url.includes('/exercices?etudiantId=')) {
+          resolve([
+            { id: 1, lien: 'https://github.com/mon-exo', statut: 'EVALUE', note: 16, commentaire: 'Bon travail, continue ainsi.' },
+          ] as any);
+        } else if (url.includes('/exercices')) {
           resolve({ id: 1, statut: 'DEPOSE' } as any);
         }
         if (url.includes('/sessions') && options?.method === 'POST') {
@@ -122,6 +144,16 @@ export const api = {
     fetchApi<void>(`/relectures/${exerciceId}`, {
       method: 'POST',
       body: JSON.stringify({ note, commentaire, relecteurId }),
+    }),
+
+  exercicesAEvaluer: (relecteurId: number) =>
+    fetchApi<ExerciceAEvaluer[]>(`/exercices/a-evaluer?relecteurId=${relecteurId}`, {
+      method: 'GET',
+    }),
+
+  mesExercices: (etudiantId: number) =>
+    fetchApi<MonExercice[]>(`/exercices?etudiantId=${etudiantId}`, {
+      method: 'GET',
     }),
 
   // --- Tableau ---
