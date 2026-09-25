@@ -55,14 +55,19 @@ cahier des charges — repéré en préparant ce ticket.*
 
 ## 6. API : Evaluer un exercice (Relecture)
 **Priorité :** Must
-**Description :** Créer l'endpoint `POST /api/relectures/{id}`.
+**Description :** Créer l'endpoint `POST /api/relectures/{id}` (`{id}` = id de
+l'exercice relu).
 **Critères d'acceptation :**
 - Enregistre une note entière entre 0 et 20 (HTTP 200) (RG5).
-- Renvoie HTTP 403 si l'auteur tente de se relire lui-même (RG3).
+- Renvoie HTTP 403 si `relecteurId` n'est pas le relecteur assigné (RG3, EF4).
 - Renvoie HTTP 409 si une relecture est déjà rendue (RG7).
 - Renvoie HTTP 400 si la note est hors borne.
 - Ne doit pas associer plus d'un relecteur au même exercice (RG9).
+- Statut de l'exercice passe à EVALUE.
 **Réf :** EF5, RG3, RG5, RG7, RG9, B2
+
+*`relecteurId` ajouté au corps (25/09) : absent du contrat imposé, nécessaire
+pour vérifier RG3 sans authentification. Voir CAHIER_DES_CHARGES.md §7.*
 
 ## 7. API : Consulter le tableau récapitulatif
 **Priorité :** Must
