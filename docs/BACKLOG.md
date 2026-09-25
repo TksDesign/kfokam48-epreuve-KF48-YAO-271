@@ -45,7 +45,13 @@
 - Crée un exercice avec un statut "DEPOSE" (HTTP 201).
 - Rejette les URLs invalides avec HTTP 400.
 - Rejette si l'exercice est déjà déposé avec HTTP 409.
-**Réf :** EF3, B2, RG11
+- Assigne automatiquement un relecteur au hasard parmi les étudiants présents
+  à la session, hors l'auteur (EF4, RG4/Q7). Statut passe à `EN_ATTENTE` si un
+  relecteur a pu être assigné, reste `DEPOSE` sinon.
+**Réf :** EF3, EF4, RG4, RG11, B2
+
+*Ajouté a posteriori (25/09) : EF4 n'était dans aucun ticket malgré Must au
+cahier des charges — repéré en préparant ce ticket.*
 
 ## 6. API : Evaluer un exercice (Relecture)
 **Priorité :** Must
