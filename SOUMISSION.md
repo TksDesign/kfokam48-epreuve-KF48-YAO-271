@@ -20,7 +20,7 @@
 | | |
 |---|---|
 | Dépôt (public) | `https://github.com/TksDesign/kfokam48-epreuve-KF48-YAO-271` |
-| Commit final — hash complet, 40 caractères | *(à remplir après le tout dernier push)* |
+| Commit final — hash complet, 40 caractères | `48db4ffcf5fb0bb46978da0eb35f3a1511068421` |
 | Branche | `main` |
 
 ## Technique
@@ -40,8 +40,8 @@ Les 5 opérations imposées du contrat + les endpoints ajoutés et justifiés (c
 ## Avant de téléverser, vérifie
 
 - [x] Mon dépôt est **public** et s'ouvre en navigation privée
-- [ ] Mon hash fait bien **40 caractères** et existe sur GitHub
-- [ ] Tout mon travail est **poussé** — `git status` est propre
+- [x] Mon hash fait bien **40 caractères** et existe sur GitHub
+- [x] Tout mon travail est **poussé** — `git status` est propre
 - [x] Mon `README` a été testé depuis un clone vierge, dans un dossier vide
 - [x] Mon `JOURNAL.md` et mon cahier des charges sont dans `docs/`
 - [x] Les trois commits `[JALON]` sont poussés et dans le bon ordre
