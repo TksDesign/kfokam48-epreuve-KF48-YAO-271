@@ -7,35 +7,37 @@ function App() {
   const [role, setRole] = useState<'FORMATEUR' | 'ETUDIANT' | 'RELECTEUR'>('ETUDIANT');
 
   return (
-    <div style={{ fontFamily: 'sans-serif', margin: '20px' }}>
-      <h1>Épreuve Finale KFOKAM48</h1>
+    <div className="app-container">
+      <h1 style={{ textAlign: 'center', marginBottom: '2rem', fontSize: '2rem' }}>
+        Épreuve Finale <span style={{ color: 'var(--primary)' }}>KFOKAM48</span>
+      </h1>
       
-      <div style={{ marginBottom: '20px', borderBottom: '1px solid #ccc', paddingBottom: '10px' }}>
+      <div className="tabs-container">
         <button 
+          className={`tab-button ${role === 'FORMATEUR' ? 'active' : ''}`}
           onClick={() => setRole('FORMATEUR')} 
-          style={{ fontWeight: role === 'FORMATEUR' ? 'bold' : 'normal', marginRight: '10px' }}
         >
-          Vue Formateur
+          👨‍🏫 Vue Formateur
         </button>
         <button 
+          className={`tab-button ${role === 'ETUDIANT' ? 'active' : ''}`}
           onClick={() => setRole('ETUDIANT')} 
-          style={{ fontWeight: role === 'ETUDIANT' ? 'bold' : 'normal', marginRight: '10px' }}
         >
-          Vue Étudiant
+          🎓 Vue Étudiant
         </button>
         <button 
+          className={`tab-button ${role === 'RELECTEUR' ? 'active' : ''}`}
           onClick={() => setRole('RELECTEUR')} 
-          style={{ fontWeight: role === 'RELECTEUR' ? 'bold' : 'normal' }}
         >
-          Vue Relecteur
+          ✍️ Vue Relecteur
         </button>
       </div>
 
-      <div>
+      <main>
         {role === 'FORMATEUR' && <EcranFormateur />}
         {role === 'ETUDIANT' && <EcranEtudiant />}
         {role === 'RELECTEUR' && <EcranRelecteur />}
-      </div>
+      </main>
     </div>
   );
 }
