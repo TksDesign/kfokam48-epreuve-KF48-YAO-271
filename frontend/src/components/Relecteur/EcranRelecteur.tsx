@@ -42,19 +42,25 @@ export default function EcranRelecteur() {
   };
 
   return (
-    <div style={{ maxWidth: 400, margin: '0 auto', padding: '1rem' }}>
-      <h2>Espace Relecteur</h2>
+    <div>
+      <h2>✍️ Espace Relecteur</h2>
 
-      <section style={{ border: '1px solid #ccc', padding: '1rem' }}>
+      <section className="card" style={{ maxWidth: '600px', margin: '0 auto' }}>
         <h3>Évaluer un pair</h3>
+        <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '1.5rem' }}>
+          Vous avez été assigné pour évaluer le travail d'un autre étudiant. Soyez constructif !
+        </p>
         
         {success ? (
-          <div style={{ color: 'green' }}>
-            <p>✓ Relecture envoyée ! (Définitive)</p>
+          <div className="alert alert-success">
+            <strong>✓ Relecture envoyée avec succès !</strong>
+            <p style={{ margin: '0.5rem 0 0 0', fontSize: '0.9rem' }}>
+              Cette évaluation est définitive et a été transmise de manière anonyme.
+            </p>
           </div>
         ) : (
           <form onSubmit={handleSubmit}>
-            <div style={{ marginBottom: '1rem' }}>
+            <div className="form-group">
               <label>Qui êtes-vous ? </label>
               <select 
                 value={relecteurId} 
@@ -68,46 +74,50 @@ export default function EcranRelecteur() {
               </select>
             </div>
 
-            <div style={{ marginBottom: '1rem' }}>
+            <div className="form-group">
               <label>Exercice assigné : </label>
               <select 
                 value={exerciceId} 
                 onChange={e => setExerciceId(e.target.value ? Number(e.target.value) : '')}
                 required
               >
-                <option value="">-- Choisir un exercice --</option>
+                <option value="">-- Sélectionner l'exercice --</option>
                 {exercicesMocks.map(exo => (
                   <option key={exo.id} value={exo.id}>Exercice #{exo.id} - {exo.lien}</option>
                 ))}
               </select>
             </div>
 
-            <div style={{ marginBottom: '1rem' }}>
-              <label>Note (0-20) : </label>
-              <input 
-                type="number" 
-                min="0" max="20" 
-                value={note} 
-                onChange={e => setNote(e.target.value ? Number(e.target.value) : '')}
-                required
-              />
+            <div className="form-group" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+              <div>
+                <label>Note (0-20) : </label>
+                <input 
+                  type="number" 
+                  min="0" max="20" 
+                  value={note} 
+                  onChange={e => setNote(e.target.value ? Number(e.target.value) : '')}
+                  required
+                  placeholder="Ex: 15"
+                />
+              </div>
             </div>
 
-            <div style={{ marginBottom: '1rem' }}>
-              <label>Commentaire : </label>
+            <div className="form-group">
+              <label>Commentaire constructif : </label>
               <textarea 
                 value={commentaire} 
                 onChange={e => setCommentaire(e.target.value)}
                 required
-                style={{ width: '100%', minHeight: '80px' }}
+                placeholder="Expliquez votre note de manière bienveillante..."
+                style={{ minHeight: '120px' }}
               />
             </div>
 
-            <button type="submit" disabled={loading}>
-              {loading ? 'Envoi...' : 'Valider définitivement'}
+            <button type="submit" className="btn" disabled={loading}>
+              {loading ? 'Envoi en cours...' : 'Valider définitivement l\'évaluation'}
             </button>
 
-            {error && <p style={{ color: 'red', marginTop: '1rem' }}>{error}</p>}
+            {error && <div className="alert alert-error">{error}</div>}
           </form>
         )}
       </section>

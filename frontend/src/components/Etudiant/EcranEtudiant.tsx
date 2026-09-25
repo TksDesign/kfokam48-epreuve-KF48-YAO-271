@@ -33,7 +33,7 @@ export default function EcranEtudiant() {
     try {
       const res = await api.marquerPresence(code, Number(etudiantId));
       setSuccessPresence(true);
-      setSessionId(res.sessionId); // Garde la session en cours pour le dépôt
+      setSessionId(res.sessionId);
     } catch (err: any) {
       setErrorPresence(err.message || 'Erreur inconnue');
     } finally {
@@ -60,14 +60,14 @@ export default function EcranEtudiant() {
   };
 
   return (
-    <div style={{ maxWidth: 400, margin: '0 auto', padding: '1rem' }}>
-      <h2>Espace Étudiant</h2>
+    <div>
+      <h2>🎓 Espace Étudiant</h2>
 
       {/* SECTION PRÉSENCE */}
-      <section style={{ border: '1px solid #ccc', padding: '1rem', marginBottom: '1rem' }}>
+      <section className="card">
         <h3>1. Marquer ma présence</h3>
         <form onSubmit={handlePresence}>
-          <div style={{ marginBottom: '1rem' }}>
+          <div className="form-group">
             <label>Mon nom : </label>
             <select 
               value={etudiantId} 
@@ -82,7 +82,7 @@ export default function EcranEtudiant() {
             </select>
           </div>
 
-          <div style={{ marginBottom: '1rem' }}>
+          <div className="form-group">
             <label>Code session : </label>
             <input 
               type="text" 
@@ -90,51 +90,57 @@ export default function EcranEtudiant() {
               onChange={e => setCode(e.target.value)}
               disabled={successPresence}
               required
+              placeholder="Ex: X1Y2Z"
             />
           </div>
 
           {!successPresence && (
-            <button type="submit" disabled={loadingPresence}>
+            <button type="submit" className="btn" disabled={loadingPresence}>
               {loadingPresence ? 'Validation...' : 'Valider Présence'}
             </button>
           )}
 
-          {errorPresence && <p style={{ color: 'red' }}>{errorPresence}</p>}
-          {successPresence && <p style={{ color: 'green' }}>✓ Présence validée !</p>}
+          {errorPresence && <div className="alert alert-error">{errorPresence}</div>}
+          {successPresence && <div className="alert alert-success">✓ Présence validée avec succès !</div>}
         </form>
       </section>
 
       {/* SECTION DÉPÔT (visible seulement si présent) */}
       {successPresence && (
-        <section style={{ border: '1px solid #ccc', padding: '1rem' }}>
+        <section className="card">
           <h3>2. Déposer mon exercice</h3>
           <form onSubmit={handleDepot}>
-            <div style={{ marginBottom: '1rem' }}>
+            <div className="form-group">
               <label>Lien de l'exercice (URL) : </label>
               <input 
                 type="url" 
                 value={lien} 
                 onChange={e => setLien(e.target.value)}
                 required
+                placeholder="https://github.com/..."
               />
             </div>
 
-            <button type="submit" disabled={loadingExercice}>
-              {loadingExercice ? 'Dépôt...' : 'Déposer'}
+            <button type="submit" className="btn" disabled={loadingExercice}>
+              {loadingExercice ? 'Dépôt...' : 'Déposer mon travail'}
             </button>
 
-            {errorExercice && <p style={{ color: 'red' }}>{errorExercice}</p>}
-            {successExercice && <p style={{ color: 'green' }}>✓ Exercice déposé !</p>}
+            {errorExercice && <div className="alert alert-error">{errorExercice}</div>}
+            {successExercice && <div className="alert alert-success">✓ Exercice déposé et prêt pour la relecture !</div>}
           </form>
         </section>
       )}
 
       {/* SECTION EVALUATION */}
       {successExercice && (
-        <section style={{ border: '1px solid #ccc', padding: '1rem', marginTop: '1rem', backgroundColor: '#f9f9f9' }}>
+        <section className="card" style={{ borderLeft: '4px solid var(--primary)' }}>
           <h3>3. Mon Évaluation</h3>
           {/* Simulation d'une évaluation reçue, le GET n'est pas dans le contrat impose mais c'est requis */}
-          <p><em>En attente de relecture par un pair... (Le nom du relecteur restera anonyme)</em></p>
+          <div style={{ backgroundColor: 'var(--bg-color)', padding: '1rem', borderRadius: 'var(--radius)' }}>
+            <p style={{ margin: 0, color: 'var(--text-muted)' }}>
+              <em>En attente de relecture par un pair... (L'identité du relecteur restera anonyme)</em>
+            </p>
+          </div>
         </section>
       )}
     </div>
