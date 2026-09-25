@@ -14,11 +14,11 @@ Chaque entrée répond aux trois mêmes questions :
 
 ## Étape 1 — Analyse et conception
 
-**Fait :** cahier des charges (9 exigences fonctionnelles, 12 règles de gestion), les trois diagrammes en Mermaid, 11 issues créées, contrat d'API complété, commit `[JALON] analyse` poussé.
+**Fait :** cahier des charges (7 exigences fonctionnelles, 11 règles de gestion), 4 diagrammes Mermaid (D1-D3 + D4 bonus états-transitions), 11 issues créées sur GitHub avec labels (must/should, backend/frontend) et milestones (v0.1/v1.0), contrat d'API complété (+2 endpoints : clôture session, présence manuelle), commit `[JALON] analyse` poussé.
 
-**Bloqué :** 12 min sur la contradiction entre Q10 et Q15. Tranchée en faveur de Q10 : Q11 décrit un usage réel et concret du formateur, Q15 n'est qu'une intention générale. Noté en section 7.
+**Bloqué :** contradiction entre Q10 et Q15 sur la modification d'une note après envoi. Tranchée en faveur de **Q15** (note définitive) : le contrat d'API imposé ne propose pas de `PUT/PATCH` sur `/api/relectures/{id}` et renvoie `409 RELECTURE_DEJA_RENDUE`, ce qui corrobore Q15 techniquement. Noté en section 7. Autre point bloquant : présence manuelle du formateur (Q14) mentionnée nulle part dans l'API imposée ni dans les diagrammes initiaux — trou comblé en ajoutant EF7/RG8 et un endpoint dédié.
 
-**IA :** m'a proposé un découpage en 18 tickets, j'en ai retenu 11. Les autres étaient des tâches techniques (« créer l'entité », « configurer Flyway »), pas des résultats utilisateur. Vérifié en relisant chaque titre : est-ce que le client le comprendrait ?
+**IA :** Antigravity a rédigé le premier jet (cahier des charges, diagrammes, backlog). Claude l'a validé contre le barème et relevé 5 manques (RG manquantes pour Q6/Q8/Q12, endpoint présence manuelle absent, backlog 100% Must sans priorisation). Corrections appliquées par Antigravity, relecture complète faite moi-même section par section contre les 16 réponses de `CLIENT.md` avant validation finale.
 
 ---
 
@@ -54,17 +54,7 @@ Chaque entrée répond aux trois mêmes questions :
 
 ---
 
-## Étape 5 — Épreuve Git
-
-**Fait :**
-
-**Bloqué :**
-
-**IA :**
-
----
-
-## Étape 6 — Soumission
+## Étape 5 — Soumission
 
 **Fait :**
 

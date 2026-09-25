@@ -99,18 +99,17 @@ La direction de la formation KFOKAM48 a besoin d'une application de suivi pour g
 - Le dépôt GitHub avec l'historique complet des commits (`[JALON] analyse`, `[JALON] v0.1`, `[JALON] v1.0`).
 - Documentation (Cahier des charges, 4 diagrammes, contrats d'API, BACKLOG.md).
 - Code source Frontend (React) et Backend (Spring Boot).
-- Dépôt de l'épreuve Git (`kfokam48-gitlab-...`).
 - Fichier de soumission (`SOUMISSION.md`) déposé sur la plateforme.
 
 ## 10. Démarche prévue
 
 1. **Étape 1 :** Analyse détaillée, formalisation de ce document, réalisation des 4 diagrammes (Cas d'utilisation, Classes, Séquence, États). Mise à jour du contrat API. Création des issues (Backlog). Validation puis `[JALON] analyse`.
 2. **Étape 2 :** Développement en parallèle du Frontend et du Backend (version initiale). Passage des tests et respect strict des contrats d'API pour l'intégration. Poussée du `[JALON] v0.1`.
-3. **Étape 3 :** Ouverture de l'enveloppe, analyse des impacts, mise à jour de la documentation.
+3. **Étape 3 :** Demande de l'enveloppe au surveillant une fois `[JALON] v0.1` poussé, analyse des impacts, mise à jour de la documentation.
 4. **Étape 4 :** Implémentation des changements de l'enveloppe et livraison du `[JALON] v1.0`.
-5. **Étape 5 & 6 :** Épreuve Git indépendante, remplissage du README final, vérification à froid, et dépôt du document de soumission avant 18h00.
+5. **Étape 5 :** Remplissage du `README` final, `CHANGELOG.md`, vérification à froid depuis un clone vierge, et dépôt du document de soumission avant 18h00.
 
-**Definition of Done — un ticket est terminé quand :**
+**Definition of Done — une issue est terminée quand :**
 - Le code compile et passe les tests unitaires.
 - Le contrat d'API est respecté.
 - Les erreurs sont proprement interceptées.
@@ -123,3 +122,4 @@ La direction de la formation KFOKAM48 a besoin d'une application de suivi pour g
 | Version | Quand | Ce qui a changé et pourquoi |
 |---|---|---|
 | 1 | 25/09 | Version initiale - Rédaction post-analyse |
+| 1.1 | 25/09 | Le surveillant a publié une révision du sujet (5 étapes au lieu de 6, épreuve Git supprimée, enveloppe remise à la demande au lieu d'un script). §9 et §10 mis à jour en conséquence, aucun impact sur les EF/RG/diagrammes. |
