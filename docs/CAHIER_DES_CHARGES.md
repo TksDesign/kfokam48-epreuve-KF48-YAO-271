@@ -82,6 +82,7 @@ La direction de la formation KFOKAM48 a besoin d'une application de suivi pour g
 | Présence manuelle (Le "trou") | Q14 demande un ajout manuel, mais la méthode n'est pas spécifiée dans l'API imposée initiale pour le formateur. | On ajoute une route `POST /api/sessions/{id}/presences-manuelles` permettant au formateur d'ajouter un étudiant sans code (source=FORMATEUR). | Ajout au contrat d'API. |
 | Ambiguïté de `relecturesEnAttente` | Q16 : "les relectures qu'il doit encore faire". Est-ce celles où il est relecteur ou celles sur son exercice ? | Il s'agit du nombre d'exercices tiers qui lui ont été assignés et qu'il n'a pas encore évalués. | Détermine la requête SQL sous-jacente du GET /api/tableau. |
 | Identité du relecteur absente de `POST /api/relectures/{id}` | Le contrat imposé ne contient que `{note, commentaire}` — aucun moyen de vérifier RG3 (auto-relecture interdite) sans authentification (Q1). | Ajout de `relecteurId` au corps, requis. Même pattern que les autres endpoints (identité explicite, pas de session). | Ajout au contrat d'API. |
+| EF5 sans endpoint ("l'étudiant relu voit son évaluation", Q8) | Aucune des 5 opérations imposées ne permet à un étudiant de consulter sa propre note. `GET /api/tableau` est la vue formateur (toute la promotion), pas adaptée. Trou repéré après coup, en relisant le frontend (issue #26). | Ajout de `GET /api/exercices?etudiantId=`, sans jamais exposer `relecteurId` (RG10). | Ajout au contrat d'API. |
 
 **Contradictions relevées :**
 
