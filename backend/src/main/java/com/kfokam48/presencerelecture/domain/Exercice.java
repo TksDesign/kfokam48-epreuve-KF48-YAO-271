@@ -35,6 +35,9 @@ public class Exercice {
     @Column(name = "relecteur_id")
     private Long relecteurId;
 
+    @Column(name = "relecteur2_id")
+    private Long relecteur2Id;
+
     protected Exercice() {
         // JPA
     }
@@ -70,10 +73,26 @@ public class Exercice {
         return relecteurId;
     }
 
+    public Long getRelecteur2Id() {
+        return relecteur2Id;
+    }
+
     /** EF4/RG4 : assignation d'un relecteur au hasard parmi les presents, hors l'auteur. */
     public void assignerRelecteur(Long relecteurId) {
         this.relecteurId = relecteurId;
         this.statut = Statut.EN_ATTENTE;
+    }
+
+    /** RG12 (etape 3) : assignation de 2 relecteurs distincts au hasard parmi les presents. relecteur2 nullable si un seul candidat. */
+    public void assignerRelecteurs(Long relecteur1, Long relecteur2) {
+        this.relecteurId = relecteur1;
+        this.relecteur2Id = relecteur2;
+        this.statut = Statut.EN_ATTENTE;
+    }
+
+    /** Nombre de relecteurs reellement assignes a cet exercice (1 ou 2). */
+    public int nombreRelecteursAssignes() {
+        return relecteur2Id != null ? 2 : 1;
     }
 
     /** EF5 : la relecture a ete rendue. */
