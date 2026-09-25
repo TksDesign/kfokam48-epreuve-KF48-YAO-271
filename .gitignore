@@ -1,0 +1,40 @@
+# --- Java / Maven / Spring Boot ---
+target/
+!.mvn/wrapper/maven-wrapper.jar
+*.class
+*.jar
+*.war
+!**/backend/.mvn/wrapper/*.jar
+.mvn/timing.properties
+.flattened-pom.xml
+HELP.md
+*.log
+*.pid
+
+# --- Node / React / Angular / Next.js ---
+node_modules/
+dist/
+build/
+.next/
+out/
+.angular/
+coverage/
+*.tsbuildinfo
+.env
+.env.local
+.env.*.local
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# --- IDE ---
+.idea/
+.vscode/
+*.iml
+.DS_Store
+
+# --- Docker / divers ---
+*.pid
+*.seed
+*.pid.lock
