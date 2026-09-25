@@ -81,6 +81,7 @@ La direction de la formation KFOKAM48 a besoin d'une application de suivi pour g
 | Clôture de la session | Q10/Q12 mentionnent "clôturer la session", mais l'API ne l'inclut pas. | Nous rajoutons un endpoint custom `PUT /api/sessions/{id}/cloture`. | Ajout au contrat d'API. |
 | Présence manuelle (Le "trou") | Q14 demande un ajout manuel, mais la méthode n'est pas spécifiée dans l'API imposée initiale pour le formateur. | On ajoute une route `POST /api/sessions/{id}/presences-manuelles` permettant au formateur d'ajouter un étudiant sans code (source=FORMATEUR). | Ajout au contrat d'API. |
 | Ambiguïté de `relecturesEnAttente` | Q16 : "les relectures qu'il doit encore faire". Est-ce celles où il est relecteur ou celles sur son exercice ? | Il s'agit du nombre d'exercices tiers qui lui ont été assignés et qu'il n'a pas encore évalués. | Détermine la requête SQL sous-jacente du GET /api/tableau. |
+| Identité du relecteur absente de `POST /api/relectures/{id}` | Le contrat imposé ne contient que `{note, commentaire}` — aucun moyen de vérifier RG3 (auto-relecture interdite) sans authentification (Q1). | Ajout de `relecteurId` au corps, requis. Même pattern que les autres endpoints (identité explicite, pas de session). | Ajout au contrat d'API. |
 
 **Contradictions relevées :**
 

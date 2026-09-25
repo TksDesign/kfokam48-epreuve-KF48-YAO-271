@@ -75,4 +75,9 @@ public class Exercice {
         this.relecteurId = relecteurId;
         this.statut = Statut.EN_ATTENTE;
     }
+
+    /** EF5 : la relecture a ete rendue. */
+    public void marquerEvalue() {
+        this.statut = Statut.EVALUE;
+    }
 }
