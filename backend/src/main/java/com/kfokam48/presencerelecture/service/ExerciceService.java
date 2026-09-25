@@ -7,6 +7,7 @@ import com.kfokam48.presencerelecture.domain.exception.LienInvalideException;
 import com.kfokam48.presencerelecture.repository.ExerciceRepository;
 import com.kfokam48.presencerelecture.repository.PresenceRepository;
 import com.kfokam48.presencerelecture.repository.RelectureRepository;
+import com.kfokam48.presencerelecture.web.dto.ExerciceAEvaluerResponse;
 import com.kfokam48.presencerelecture.web.dto.MonExerciceResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -69,6 +70,14 @@ public class ExerciceService {
                             relecture != null ? relecture.getCommentaire() : null
                     );
                 })
+                .toList();
+    }
+
+    /** Exercices assignes a ce relecteur, pas encore evalues - pour l'ecran Relecteur (au lieu d'une liste figee en dur). */
+    @Transactional(readOnly = true)
+    public List<ExerciceAEvaluerResponse> aEvaluerPour(Long relecteurId) {
+        return exerciceRepository.findByRelecteurIdAndStatut(relecteurId, Exercice.Statut.EN_ATTENTE).stream()
+                .map(ExerciceAEvaluerResponse::depuis)
                 .toList();
     }
 

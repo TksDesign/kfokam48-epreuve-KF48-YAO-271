@@ -14,4 +14,6 @@ public interface ExerciceRepository extends JpaRepository<Exercice, Long> {
 
     /** RG : relectures "en attente" = exercices assignes a lui comme relecteur, pas encore evalues (CDC §7). */
     long countByRelecteurIdAndStatut(Long relecteurId, Exercice.Statut statut);
+
+    List<Exercice> findByRelecteurIdAndStatut(Long relecteurId, Exercice.Statut statut);
 }

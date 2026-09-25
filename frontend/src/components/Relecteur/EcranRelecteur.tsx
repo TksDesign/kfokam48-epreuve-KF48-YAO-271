@@ -1,27 +1,39 @@
-import { useState } from 'react';
-import { api } from '../../services/api';
+import { useState, useEffect } from 'react';
+import { api, ExerciceAEvaluer } from '../../services/api';
 
 export default function EcranRelecteur() {
   const [relecteurId, setRelecteurId] = useState<number | ''>('');
   const [exerciceId, setExerciceId] = useState<number | ''>('');
   const [note, setNote] = useState<number | ''>('');
   const [commentaire, setCommentaire] = useState('');
-  
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
 
-  // Mocks pour Q1 et les exercices
+  const [exercices, setExercices] = useState<ExerciceAEvaluer[]>([]);
+  const [loadingExercices, setLoadingExercices] = useState(false);
+
+  // Mocks pour Q1 uniquement (pas d'endpoint contrat pour lister les etudiants)
   const etudiantsMocks = [
     { id: 1, nom: 'Alice Martin' },
     { id: 2, nom: 'Bob Dupuis' },
     { id: 3, nom: 'Charlie Legrand' },
   ];
 
-  const exercicesMocks = [
-    { id: 1, lien: 'https://github.com/exo1' },
-    { id: 2, lien: 'https://github.com/exo2' },
-  ];
+  // Charge la vraie liste des exercices assignes des que le relecteur est choisi
+  useEffect(() => {
+    if (!relecteurId) {
+      setExercices([]);
+      return;
+    }
+    setLoadingExercices(true);
+    setExerciceId('');
+    api.exercicesAEvaluer(Number(relecteurId))
+      .then(setExercices)
+      .catch(() => setExercices([]))
+      .finally(() => setLoadingExercices(false));
+  }, [relecteurId]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -76,13 +88,22 @@ export default function EcranRelecteur() {
 
             <div className="form-group">
               <label>Exercice assigné : </label>
-              <select 
-                value={exerciceId} 
+              <select
+                value={exerciceId}
                 onChange={e => setExerciceId(e.target.value ? Number(e.target.value) : '')}
                 required
+                disabled={!relecteurId || loadingExercices}
               >
-                <option value="">-- Sélectionner l'exercice --</option>
-                {exercicesMocks.map(exo => (
+                <option value="">
+                  {!relecteurId
+                    ? '-- Choisissez d\'abord qui vous êtes --'
+                    : loadingExercices
+                    ? 'Chargement...'
+                    : exercices.length === 0
+                    ? 'Aucun exercice à évaluer pour le moment'
+                    : '-- Sélectionner l\'exercice --'}
+                </option>
+                {exercices.map(exo => (
                   <option key={exo.id} value={exo.id}>Exercice #{exo.id} - {exo.lien}</option>
                 ))}
               </select>

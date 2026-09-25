@@ -1,11 +1,11 @@
 import { useState } from 'react';
-import { api } from '../../services/api';
+import { api, MonExercice } from '../../services/api';
 
 export default function EcranEtudiant() {
   const [etudiantId, setEtudiantId] = useState<number | ''>('');
   const [code, setCode] = useState('');
   const [lien, setLien] = useState('');
-  
+
   const [loadingPresence, setLoadingPresence] = useState(false);
   const [errorPresence, setErrorPresence] = useState<string | null>(null);
   const [successPresence, setSuccessPresence] = useState(false);
@@ -14,6 +14,9 @@ export default function EcranEtudiant() {
   const [loadingExercice, setLoadingExercice] = useState(false);
   const [errorExercice, setErrorExercice] = useState<string | null>(null);
   const [successExercice, setSuccessExercice] = useState(false);
+
+  const [monExercice, setMonExercice] = useState<MonExercice | null>(null);
+  const [loadingEvaluation, setLoadingEvaluation] = useState(false);
 
   // Mock list for Q1
   const etudiantsMocks = [
@@ -52,10 +55,25 @@ export default function EcranEtudiant() {
     try {
       await api.deposerExercice(sessionId, Number(etudiantId), lien);
       setSuccessExercice(true);
+      chargerMonEvaluation();
     } catch (err: any) {
       setErrorExercice(err.message || 'Erreur lors du dépôt');
     } finally {
       setLoadingExercice(false);
+    }
+  };
+
+  const chargerMonEvaluation = async () => {
+    if (!etudiantId) return;
+    setLoadingEvaluation(true);
+    try {
+      const mesExercices = await api.mesExercices(Number(etudiantId));
+      // Le plus recent depose est celui qu'on vient de soumettre
+      setMonExercice(mesExercices.length > 0 ? mesExercices[mesExercices.length - 1] : null);
+    } catch {
+      // Silencieux : la section reste "en attente" si l'appel echoue
+    } finally {
+      setLoadingEvaluation(false);
     }
   };
 
@@ -134,13 +152,35 @@ export default function EcranEtudiant() {
       {/* SECTION EVALUATION */}
       {successExercice && (
         <section className="card" style={{ borderLeft: '4px solid var(--primary)' }}>
-          <h3>3. Mon Évaluation</h3>
-          {/* Simulation d'une évaluation reçue, le GET n'est pas dans le contrat impose mais c'est requis */}
-          <div style={{ backgroundColor: 'var(--bg-color)', padding: '1rem', borderRadius: 'var(--radius)' }}>
-            <p style={{ margin: 0, color: 'var(--text-muted)' }}>
-              <em>En attente de relecture par un pair... (L'identité du relecteur restera anonyme)</em>
-            </p>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <h3 style={{ border: 'none', margin: 0, padding: 0 }}>3. Mon Évaluation</h3>
+            <button
+              className="btn"
+              style={{ width: 'auto', padding: '0.4rem 0.8rem', fontSize: '0.85rem' }}
+              onClick={chargerMonEvaluation}
+              disabled={loadingEvaluation}
+            >
+              🔄 {loadingEvaluation ? 'Vérification...' : 'Vérifier'}
+            </button>
           </div>
+
+          {monExercice?.note != null ? (
+            <div style={{ backgroundColor: 'var(--bg-color)', padding: '1rem', borderRadius: 'var(--radius)', marginTop: '1rem' }}>
+              <p style={{ margin: '0 0 0.5rem 0', fontWeight: 'bold', fontSize: '1.2rem' }}>
+                Note : {monExercice.note}/20
+              </p>
+              <p style={{ margin: 0 }}>{monExercice.commentaire}</p>
+              <p style={{ margin: '0.5rem 0 0 0', color: 'var(--text-muted)', fontSize: '0.85rem' }}>
+                <em>L'identité du relecteur reste anonyme.</em>
+              </p>
+            </div>
+          ) : (
+            <div style={{ backgroundColor: 'var(--bg-color)', padding: '1rem', borderRadius: 'var(--radius)', marginTop: '1rem' }}>
+              <p style={{ margin: 0, color: 'var(--text-muted)' }}>
+                <em>En attente de relecture par un pair... (L'identité du relecteur restera anonyme). Clique "Vérifier" pour actualiser.</em>
+              </p>
+            </div>
+          )}
         </section>
       )}
     </div>

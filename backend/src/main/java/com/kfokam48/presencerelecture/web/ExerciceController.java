@@ -3,6 +3,7 @@ package com.kfokam48.presencerelecture.web;
 import com.kfokam48.presencerelecture.domain.Exercice;
 import com.kfokam48.presencerelecture.service.ExerciceService;
 import com.kfokam48.presencerelecture.web.dto.DeposerExerciceRequest;
+import com.kfokam48.presencerelecture.web.dto.ExerciceAEvaluerResponse;
 import com.kfokam48.presencerelecture.web.dto.ExerciceResponse;
 import com.kfokam48.presencerelecture.web.dto.MonExerciceResponse;
 import jakarta.validation.Valid;
@@ -36,5 +37,10 @@ public class ExerciceController {
     @GetMapping
     public List<MonExerciceResponse> mesExercices(@RequestParam Long etudiantId) {
         return exerciceService.mesExercices(etudiantId);
+    }
+
+    @GetMapping("/a-evaluer")
+    public List<ExerciceAEvaluerResponse> aEvaluer(@RequestParam Long relecteurId) {
+        return exerciceService.aEvaluerPour(relecteurId);
     }
 }
