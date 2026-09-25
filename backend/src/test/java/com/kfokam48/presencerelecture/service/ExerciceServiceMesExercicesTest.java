@@ -13,7 +13,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.Instant;
 import java.util.List;
-import java.util.Optional;
 import java.util.Random;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -42,7 +41,7 @@ class ExerciceServiceMesExercicesTest {
     void note_et_commentaire_nulls_tant_que_non_evalue() {
         Exercice exercice = new Exercice("https://example.com/exo", 1L, 10L);
         when(exerciceRepository.findByAuteurId(10L)).thenReturn(List.of(exercice));
-        when(relectureRepository.findByExerciceId(exercice.getId())).thenReturn(Optional.empty());
+        when(relectureRepository.findByExerciceId(exercice.getId())).thenReturn(List.of());
 
         List<MonExerciceResponse> resultat = creerService().mesExercices(10L);
 
@@ -50,22 +49,43 @@ class ExerciceServiceMesExercicesTest {
         assertThat(resultat.get(0).statut()).isEqualTo("DEPOSE");
         assertThat(resultat.get(0).note()).isNull();
         assertThat(resultat.get(0).commentaire()).isNull();
+        assertThat(resultat.get(0).provisoire()).isFalse();
     }
 
     @Test
-    void retourne_la_note_et_le_commentaire_une_fois_evalue() {
+    void note_provisoire_quand_un_seul_des_deux_relecteurs_a_rendu() {
         Exercice exercice = new Exercice("https://example.com/exo", 1L, 10L);
-        exercice.assignerRelecteur(20L);
-        exercice.marquerEvalue();
-        Relecture relecture = new Relecture(18, "excellent travail", Instant.now(), exercice.getId());
+        exercice.assignerRelecteurs(20L, 30L);
+        Relecture relecture = new Relecture(18, "en cours de relecture", Instant.now(), exercice.getId(), 20L);
 
         when(exerciceRepository.findByAuteurId(10L)).thenReturn(List.of(exercice));
-        when(relectureRepository.findByExerciceId(exercice.getId())).thenReturn(Optional.of(relecture));
+        when(relectureRepository.findByExerciceId(exercice.getId())).thenReturn(List.of(relecture));
+
+        List<MonExerciceResponse> resultat = creerService().mesExercices(10L);
+
+        assertThat(resultat.get(0).statut()).isEqualTo("EN_ATTENTE");
+        assertThat(resultat.get(0).note()).isEqualTo(18.0);
+        assertThat(resultat.get(0).provisoire()).isTrue();
+    }
+
+    @Test
+    void retourne_la_moyenne_une_fois_les_deux_relectures_rendues() {
+        Exercice exercice = new Exercice("https://example.com/exo", 1L, 10L);
+        exercice.assignerRelecteurs(20L, 30L);
+        exercice.marquerEvalue();
+        Instant t1 = Instant.parse("2026-09-25T10:00:00Z");
+        Instant t2 = Instant.parse("2026-09-25T11:00:00Z");
+        Relecture relecture1 = new Relecture(18, "premiere relecture", t1, exercice.getId(), 20L);
+        Relecture relecture2 = new Relecture(12, "deuxieme relecture, plus recente", t2, exercice.getId(), 30L);
+
+        when(exerciceRepository.findByAuteurId(10L)).thenReturn(List.of(exercice));
+        when(relectureRepository.findByExerciceId(exercice.getId())).thenReturn(List.of(relecture1, relecture2));
 
         List<MonExerciceResponse> resultat = creerService().mesExercices(10L);
 
         assertThat(resultat.get(0).statut()).isEqualTo("EVALUE");
-        assertThat(resultat.get(0).note()).isEqualTo(18);
-        assertThat(resultat.get(0).commentaire()).isEqualTo("excellent travail");
+        assertThat(resultat.get(0).note()).isEqualTo(15.0);
+        assertThat(resultat.get(0).commentaire()).isEqualTo("deuxieme relecture, plus recente");
+        assertThat(resultat.get(0).provisoire()).isFalse();
     }
 }

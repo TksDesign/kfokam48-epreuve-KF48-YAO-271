@@ -52,6 +52,34 @@ class ExerciceServiceTest {
     }
 
     @Test
+    void assigne_deux_relecteurs_distincts_quand_deux_candidats_sont_presents() {
+        when(exerciceRepository.existsBySessionIdAndAuteurId(1L, 10L)).thenReturn(false);
+        when(presenceRepository.trouverEtudiantsPresentsHorsAuteur(1L, 10L)).thenReturn(List.of(20L, 30L));
+        when(exerciceRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
+
+        Exercice exercice = creerService().deposer(1L, 10L, "https://example.com/exo.pdf");
+
+        assertThat(exercice.getStatut()).isEqualTo(Exercice.Statut.EN_ATTENTE);
+        assertThat(exercice.getRelecteurId()).isNotNull();
+        assertThat(exercice.getRelecteur2Id()).isNotNull();
+        assertThat(exercice.getRelecteurId()).isNotEqualTo(exercice.getRelecteur2Id());
+        assertThat(List.of(exercice.getRelecteurId(), exercice.getRelecteur2Id())).containsExactlyInAnyOrder(20L, 30L);
+    }
+
+    @Test
+    void assigne_un_seul_relecteur_quand_un_seul_candidat_est_present() {
+        when(exerciceRepository.existsBySessionIdAndAuteurId(1L, 10L)).thenReturn(false);
+        when(presenceRepository.trouverEtudiantsPresentsHorsAuteur(1L, 10L)).thenReturn(List.of(20L));
+        when(exerciceRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
+
+        Exercice exercice = creerService().deposer(1L, 10L, "https://example.com/exo.pdf");
+
+        assertThat(exercice.getRelecteurId()).isEqualTo(20L);
+        assertThat(exercice.getRelecteur2Id()).isNull();
+        assertThat(exercice.nombreRelecteursAssignes()).isEqualTo(1);
+    }
+
+    @Test
     void reste_depose_sans_candidat_present() {
         when(exerciceRepository.existsBySessionIdAndAuteurId(1L, 10L)).thenReturn(false);
         when(presenceRepository.trouverEtudiantsPresentsHorsAuteur(1L, 10L)).thenReturn(List.of());

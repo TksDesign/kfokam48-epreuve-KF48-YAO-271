@@ -26,18 +26,23 @@ public class Relecture {
     @Column(nullable = false)
     private Instant date;
 
-    @Column(name = "exercice_id", nullable = false, unique = true)
+    @Column(name = "exercice_id", nullable = false)
     private Long exerciceId;
+
+    @Column(name = "relecteur_id", nullable = false)
+    private Long relecteurId;
 
     protected Relecture() {
         // JPA
     }
 
-    public Relecture(Integer note, String commentaire, Instant date, Long exerciceId) {
+    /** RG12 (etape 3) : relecteurId obligatoire - un exercice peut avoir 2 relectures, il faut savoir laquelle appartient a qui. */
+    public Relecture(Integer note, String commentaire, Instant date, Long exerciceId, Long relecteurId) {
         this.note = note;
         this.commentaire = commentaire;
         this.date = date;
         this.exerciceId = exerciceId;
+        this.relecteurId = relecteurId;
     }
 
     public Long getId() {
@@ -58,5 +63,9 @@ public class Relecture {
 
     public Long getExerciceId() {
         return exerciceId;
+    }
+
+    public Long getRelecteurId() {
+        return relecteurId;
     }
 }

@@ -26,7 +26,13 @@ public class RelectureService {
         this.clock = clock;
     }
 
-    /** EF5 : le relecteur assigne rend sa note et son commentaire. */
+    /**
+     * EF5 : un des relecteurs assignes rend sa note et son commentaire.
+     * RG12/RG13 (etape 3) : jusqu'a 2 relecteurs distincts par exercice.
+     * Le 409 se decide desormais par relecteur (pas par exercice) - l'autre
+     * relecteur peut toujours rendre la sienne independamment. L'exercice ne
+     * passe EVALUE que quand tous les relecteurs assignes ont rendu.
+     */
     @Transactional
     public void evaluer(Long exerciceId, Long relecteurId, Integer note, String commentaire) {
         if (note == null || note < 0 || note > 20) {
@@ -36,17 +42,22 @@ public class RelectureService {
         Exercice exercice = exerciceRepository.findById(exerciceId)
                 .orElseThrow(ExerciceInconnuException::new);
 
-        // RG3/EF4 : seul le relecteur reellement assigne peut rendre cette relecture.
-        if (exercice.getRelecteurId() == null || !exercice.getRelecteurId().equals(relecteurId)) {
+        // RG3/EF4 : seul un relecteur reellement assigne (slot 1 ou 2) peut rendre cette relecture.
+        boolean estAssigne = relecteurId.equals(exercice.getRelecteurId()) || relecteurId.equals(exercice.getRelecteur2Id());
+        if (!estAssigne) {
             throw new AutoRelectureException();
         }
 
-        if (relectureRepository.existsByExerciceId(exerciceId)) {
+        if (relectureRepository.existsByExerciceIdAndRelecteurId(exerciceId, relecteurId)) {
             throw new RelectureDejaRenduException();
         }
 
-        relectureRepository.save(new Relecture(note, commentaire, clock.instant(), exerciceId));
-        exercice.marquerEvalue();
-        exerciceRepository.save(exercice);
+        long relecturesDejaRendues = relectureRepository.findByExerciceId(exerciceId).size();
+        relectureRepository.save(new Relecture(note, commentaire, clock.instant(), exerciceId, relecteurId));
+
+        if (relecturesDejaRendues + 1 >= exercice.nombreRelecteursAssignes()) {
+            exercice.marquerEvalue();
+            exerciceRepository.save(exercice);
+        }
     }
 }

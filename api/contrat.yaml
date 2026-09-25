@@ -107,6 +107,12 @@ paths:
         evaluation", Q8) n'a aucun endpoint dans les 5 operations d'origine.
         GET /api/tableau ne convient pas (vue formateur, toute la promotion).
         Ne renvoie JAMAIS relecteurId (RG10, anonymat du relecteur).
+
+        Revise etape 3 (RG12/RG13, changement de besoin double relecteur,
+        issues #38-#40) : `note` est desormais la MOYENNE des 2 relectures
+        si les 2 ont ete rendues. Si une seule a ete rendue, `note` est
+        celle de ce seul relecteur et `provisoire=true` (peut encore
+        changer). Si aucune, `note=null` et `provisoire=false`.
       parameters:
         - name: etudiantId
           in: query
@@ -121,13 +127,14 @@ paths:
                 type: array
                 items:
                   type: object
-                  required: [id, lien, statut]
+                  required: [id, lien, statut, provisoire]
                   properties:
                     id: { type: integer, format: int64 }
                     lien: { type: string, format: uri }
                     statut: { type: string }
-                    note: { type: integer, nullable: true }
-                    commentaire: { type: string, nullable: true }
+                    note: { type: number, nullable: true, description: "Moyenne des 2 relectures, ou note unique si 1 seule rendue (voir provisoire)" }
+                    commentaire: { type: string, nullable: true, description: "Commentaire de la derniere relecture rendue" }
+                    provisoire: { type: boolean, description: "true si une seule des 2 relectures a ete rendue (RG13)" }
 
   /api/relectures/{id}:
     post:
@@ -139,6 +146,12 @@ paths:
         (auto-relecture interdite) et que seul le relecteur reellement
         assigne (EF4/RG4) peut rendre cette relecture - meme pattern que
         les autres endpoints (etudiantId explicite dans le corps).
+
+        Revise etape 3 (RG12, issues #38-#40) : un exercice a maintenant
+        jusqu'a 2 relecteurs distincts. Le 409 RELECTURE_DEJA_RENDUE ne
+        se declenche plus des qu'UNE relecture existe pour l'exercice,
+        mais seulement si CE `relecteurId` precis a deja rendu la sienne -
+        l'autre relecteur peut toujours rendre la sienne independamment.
       parameters:
         - name: id
           in: path

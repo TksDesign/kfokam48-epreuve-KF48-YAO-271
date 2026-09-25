@@ -67,9 +67,13 @@ La direction de la formation KFOKAM48 a besoin d'une application de suivi pour g
 | RG6 | Un étudiant peut remplacer son lien tant que la relecture n'est pas commencée | Q13 |
 | RG7 | Une relecture envoyée est définitive | Q15 |
 | RG8 | Une présence peut être ajoutée manuellement par le formateur (source=FORMATEUR) | Q14 |
-| RG9 | Un exercice est corrigé par un et un seul relecteur | Q6 |
+| RG9 | ~~Un exercice est corrigé par un et un seul relecteur~~ — **remplacée par RG12** (enveloppe étape 3, changement de besoin) | Q6 |
 | RG10 | L'identité du relecteur est anonyme (masquée) pour l'étudiant évalué | Q8 |
 | RG11 | Le dépôt d'un exercice reste possible jusqu'à la clôture de la session (même après expiration du code) | Q12 |
+| RG12 | Un exercice est relu par **deux** relecteurs distincts (parmi les présents, hors auteur). La note retenue est la **moyenne** des deux notes. | Q6 (révisé, enveloppe étape 3) |
+| RG13 | Si un seul des deux relecteurs a rendu sa note, elle est affichée à l'étudiant comme **provisoire** (peut encore changer) | Enveloppe étape 3 |
+
+> **RG9 → RG12/RG13 (25/09, étape 3) :** le client est revenu après le premier test avec un changement de besoin cassant RG9 (« un seul relecteur ça ne marche pas : quand il ne rend rien, l'étudiant n'a aucune note »). Voir section 7 pour l'analyse d'impact complète.
 
 ## 7. Zones d'ombre, hypothèses et contradictions
 
@@ -83,12 +87,37 @@ La direction de la formation KFOKAM48 a besoin d'une application de suivi pour g
 | Ambiguïté de `relecturesEnAttente` | Q16 : "les relectures qu'il doit encore faire". Est-ce celles où il est relecteur ou celles sur son exercice ? | Il s'agit du nombre d'exercices tiers qui lui ont été assignés et qu'il n'a pas encore évalués. | Détermine la requête SQL sous-jacente du GET /api/tableau. |
 | Identité du relecteur absente de `POST /api/relectures/{id}` | Le contrat imposé ne contient que `{note, commentaire}` — aucun moyen de vérifier RG3 (auto-relecture interdite) sans authentification (Q1). | Ajout de `relecteurId` au corps, requis. Même pattern que les autres endpoints (identité explicite, pas de session). | Ajout au contrat d'API. |
 | EF5 sans endpoint ("l'étudiant relu voit son évaluation", Q8) | Aucune des 5 opérations imposées ne permet à un étudiant de consulter sa propre note. `GET /api/tableau` est la vue formateur (toute la promotion), pas adaptée. Trou repéré après coup, en relisant le frontend (issue #26). | Ajout de `GET /api/exercices?etudiantId=`, sans jamais exposer `relecteurId` (RG10). | Ajout au contrat d'API. |
+| File d'attente jamais implémentée (ligne ci-dessus) | Repéré en testant le rôle relecteur en conditions réelles (étape 3, enveloppe) : un exercice déposé sans candidat présent reste `DEPOSE` sans relecteur **indéfiniment** — rien ne retente l'assignation plus tard, contrairement à ce que "mise en file d'attente" laissait entendre. | Ne pas corriger isolément : la logique d'assignation est de toute façon réécrite par le changement RG6 (double relecteur, étape 3). Traité une seule fois, dans ce chantier-là. | Absorbé dans le refactor RG6 ; pas d'issue/branche dédiée pour ce point seul. |
 
 **Contradictions relevées :**
 
 | Réponses en conflit | Ce que j'ai choisi | Pourquoi |
 |---|---|---|
 | Q10 (modification possible) vs Q15 (définitive) | Je tranche en faveur de Q15 (note définitive). | Le contrat d'API imposé (`POST /api/relectures/{id}`) ne propose pas de `PUT/PATCH` et retourne l'erreur `409 RELECTURE_DEJA_RENDUE`. Cela corrobore Q15 techniquement. |
+
+## 7bis. Changement de besoin — étape 3 (enveloppe, 25/09)
+
+**Demande client (verbatim) :** « Finalement, un seul relecteur ça ne marche pas : quand il ne rend rien, l'étudiant n'a aucune note. À partir de maintenant, chaque exercice est relu par deux pairs différents, et la note retenue est la moyenne des deux. Si un seul des deux a rendu, on affiche sa note en attendant, mais marquée comme provisoire. »
+
+**Règle cassée :** RG9 (« un et un seul relecteur »), issue de Q6. Remplacée par RG12 + RG13 (section 6).
+
+**Impact identifié :**
+| Zone | Avant | Après |
+|---|---|---|
+| Modèle de données | `exercice.relecteur_id` (1 seul, nullable) | `exercice.relecteur_id` + `exercice.relecteur2_id` (2 candidats distincts, hors auteur) |
+| Table `relecture` | `UNIQUE(exercice_id)` — 1 seule relecture possible, **pas de colonne `relecteur_id` persistée** (jamais nécessaire tant qu'il n'y en avait qu'un) | `UNIQUE(exercice_id, relecteur_id)` — 2 relectures possibles, `relecteur_id` ajouté et rempli (obligatoire pour savoir laquelle des 2 notes appartient à qui) |
+| Statut d'un exercice | `EVALUE` dès la 1ʳᵉ (et unique) relecture rendue | `EVALUE` seulement quand les 2 relectures sont rendues ; 1 seule rendue ⇒ reste `EN_ATTENTE` mais une note **provisoire** est déjà consultable |
+| `GET /api/exercices?etudiantId=` | `note` = note unique ou `null` | `note` = moyenne si 2 rendues, sinon note du seul relecteur ayant rendu (`provisoire=true`), sinon `null` |
+| `POST /api/relectures/{id}` | 409 `RELECTURE_DEJA_RENDUE` dès qu'une relecture existe pour l'exercice | 409 seulement si **ce relecteur précis** a déjà rendu (l'autre relecteur peut encore rendre la sienne) |
+| RG4 (assignation aléatoire) | 1 tirage parmi les présents | 2 tirages sans remise parmi les présents (si 1 seul présent candidat : assignation partielle, comportement RG13 s'applique dès le départ) |
+| Gap "file d'attente" (section 7, ligne ci-dessus) | Jamais implémenté, documenté comme dette | Traité dans ce chantier : la ré-écriture de l'assignation est l'occasion de ne pas réintroduire le même trou côté "2ᵉ relecteur manquant" — reste néanmoins **hors périmètre v1.0** pour la ré-assignation différée (voir sacrifice ci-dessous) |
+
+**Ce qui sort du périmètre pour absorber ce changement (Must tardif) :**
+- **Ré-assignation différée** (assigner un relecteur manquant quand un nouvel étudiant marque présence après coup) : reste non implémentée, comme avant. La 2-relecteurs ne fait qu'hériter du même comportement documenté en section 7 (candidats insuffisants au dépôt ⇒ assignation partielle ou nulle, jamais retentée). Sacrifié parce que ça demande un déclencheur (event/job) hors du scope "endpoint synchrone" du reste de l'API, et le client n'en a pas fait une exigence explicite dans l'enveloppe.
+- **Notification/rappel au relecteur qui n'a pas rendu sa note** : non implémenté. Le client demande juste que la note provisoire s'affiche, pas un système de relance.
+- **Frontend (écran Relecteur/Étudiant) : affichage détaillé "provisoire vs finale"** : le backend expose le champ, mais l'habillage visuel (badge, couleur) est traité en dernière priorité si le temps le permet — sacrifié en premier si nécessaire, car sans impact sur la correction du backend qui est ce qui est noté à cette étape (10 points, tous côté process backend/migration/analyse).
+
+Priorité : migration + backend (assignation, relecture, contrat) d'abord — c'est ce que l'enveloppe évalue. Frontend en dernier, sacrifiable.
 
 ## 8. Contraintes techniques
 
@@ -125,3 +154,4 @@ La direction de la formation KFOKAM48 a besoin d'une application de suivi pour g
 |---|---|---|
 | 1 | 25/09 | Version initiale - Rédaction post-analyse |
 | 1.1 | 25/09 | Le surveillant a publié une révision du sujet (5 étapes au lieu de 6, épreuve Git supprimée, enveloppe remise à la demande au lieu d'un script). §9 et §10 mis à jour en conséquence, aucun impact sur les EF/RG/diagrammes. |
+| 1.2 | 25/09 | Enveloppe étape 3 : changement de besoin double relecteur. RG9 remplacée par RG12/RG13 (§6), analyse d'impact complète et sacrifice de périmètre en §7bis. Conséquence directe, traité dans un commit dédié sur `evolution/double-relecteur-rg6` (séparé du bugfix #37). |
