@@ -128,6 +128,15 @@ export default function EcranEtudiant() {
           </form>
         </section>
       )}
+
+      {/* SECTION EVALUATION */}
+      {successExercice && (
+        <section style={{ border: '1px solid #ccc', padding: '1rem', marginTop: '1rem', backgroundColor: '#f9f9f9' }}>
+          <h3>3. Mon Évaluation</h3>
+          {/* Simulation d'une évaluation reçue, le GET n'est pas dans le contrat impose mais c'est requis */}
+          <p><em>En attente de relecture par un pair... (Le nom du relecteur restera anonyme)</em></p>
+        </section>
+      )}
     </div>
   );
 }
