@@ -10,7 +10,7 @@
 
 | | |
 |---|---|
-| Nom et prénom(s) | Tissie Kuate Shanonn Daphanne |
+| Nom et prénom(s) | Tissie Kuate Shanonn Daphane |
 | Matricule | KF48-YAO-271 |
 | Centre | Yaoundé |
 | Compte GitHub | TksDesign |
