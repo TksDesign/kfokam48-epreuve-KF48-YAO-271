@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { api, ApiError } from '../../services/api';
+import { api } from '../../services/api';
 
 export default function EcranEtudiant() {
   const [etudiantId, setEtudiantId] = useState<number | ''>('');

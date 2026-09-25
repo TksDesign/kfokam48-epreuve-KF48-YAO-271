@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { api, Session } from '../../services/api';
 
 export default function EcranFormateur() {

@@ -1,4 +1,4 @@
-export const API_BASE_URL = 'http://localhost:8080/api';
+export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api';
 
 // Définitions des types
 export interface Session {
@@ -25,7 +25,8 @@ export interface ApiError {
   message: string;
 }
 
-const USE_MOCKS = true; // Activer le mode mock en attendant le backend de Claude
+// Activer le mode mock en attendant le backend de Claude. Désactivable via VITE_USE_MOCKS=false
+const USE_MOCKS = import.meta.env.VITE_USE_MOCKS !== 'false'; 
 
 // Helper pour gérer les réponses
 async function fetchApi<T>(url: string, options?: RequestInit): Promise<T> {
