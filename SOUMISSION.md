@@ -50,4 +50,4 @@ Les 5 opérations imposées du contrat + les endpoints ajoutés et justifiés (c
 
 **Déclaration.** J'ai réalisé ce travail seul. Les outils d'IA étaient autorisés sans restriction et je les ai utilisés ; mon journal indique où et comment j'ai vérifié leurs réponses. Mon dépôt restera public et inchangé jusqu'à la publication des résultats.
 
-Signature : ______________________  Date : __________
+Signature : ______________________  Date : 2026-09-25
