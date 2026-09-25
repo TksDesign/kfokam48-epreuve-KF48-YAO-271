@@ -16,7 +16,14 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -111,5 +118,46 @@ class PresenceControllerIntegrationTest {
                         .content("{\"code\":\"" + codeValide + "\",\"etudiantId\":5}"))
                 .andExpect(status().isTooManyRequests())
                 .andExpect(jsonPath("$.code").value("TROP_DE_TENTATIVES"));
+    }
+
+    /**
+     * Issue #37 : deux requetes quasi simultanees pour le meme etudiant/session
+     * (double clic, double onglet) ne doivent jamais produire un 500 -
+     * la seconde doit recevoir un 409 DEJA_PRESENT propre, pas une exception
+     * de contrainte DB non traduite.
+     */
+    @Test
+    void deux_requetes_concurrentes_meme_etudiant_ne_donnent_jamais_500() throws Exception {
+        int nbThreads = 2;
+        ExecutorService executor = Executors.newFixedThreadPool(nbThreads);
+        CountDownLatch pret = new CountDownLatch(nbThreads);
+        CountDownLatch depart = new CountDownLatch(1);
+        List<Integer> statuts = new java.util.concurrent.CopyOnWriteArrayList<>();
+        AtomicInteger erreursInattendues = new AtomicInteger(0);
+
+        for (int i = 0; i < nbThreads; i++) {
+            executor.submit(() -> {
+                try {
+                    pret.countDown();
+                    depart.await();
+                    int statut = mockMvc.perform(post("/api/presences")
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .content("{\"code\":\"" + codeValide + "\",\"etudiantId\":5}"))
+                            .andReturn().getResponse().getStatus();
+                    statuts.add(statut);
+                } catch (Exception e) {
+                    erreursInattendues.incrementAndGet();
+                }
+            });
+        }
+
+        pret.await();
+        depart.countDown();
+        executor.shutdown();
+        executor.awaitTermination(10, TimeUnit.SECONDS);
+
+        assertThat(erreursInattendues.get()).isZero();
+        assertThat(statuts).hasSize(2);
+        assertThat(statuts).containsExactlyInAnyOrder(201, 409);
     }
 }
