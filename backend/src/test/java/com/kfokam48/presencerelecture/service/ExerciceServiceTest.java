@@ -5,6 +5,7 @@ import com.kfokam48.presencerelecture.domain.exception.ExerciceDejaDeposeExcepti
 import com.kfokam48.presencerelecture.domain.exception.LienInvalideException;
 import com.kfokam48.presencerelecture.repository.ExerciceRepository;
 import com.kfokam48.presencerelecture.repository.PresenceRepository;
+import com.kfokam48.presencerelecture.repository.RelectureRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -31,8 +32,11 @@ class ExerciceServiceTest {
     @Mock
     private PresenceRepository presenceRepository;
 
+    @Mock
+    private RelectureRepository relectureRepository;
+
     private ExerciceService creerService() {
-        return new ExerciceService(exerciceRepository, presenceRepository, new Random());
+        return new ExerciceService(exerciceRepository, presenceRepository, relectureRepository, new Random());
     }
 
     @Test

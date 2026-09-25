@@ -1,10 +1,13 @@
 package com.kfokam48.presencerelecture.service;
 
 import com.kfokam48.presencerelecture.domain.Exercice;
+import com.kfokam48.presencerelecture.domain.Relecture;
 import com.kfokam48.presencerelecture.domain.exception.ExerciceDejaDeposeException;
 import com.kfokam48.presencerelecture.domain.exception.LienInvalideException;
 import com.kfokam48.presencerelecture.repository.ExerciceRepository;
 import com.kfokam48.presencerelecture.repository.PresenceRepository;
+import com.kfokam48.presencerelecture.repository.RelectureRepository;
+import com.kfokam48.presencerelecture.web.dto.MonExerciceResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,11 +21,14 @@ public class ExerciceService {
 
     private final ExerciceRepository exerciceRepository;
     private final PresenceRepository presenceRepository;
+    private final RelectureRepository relectureRepository;
     private final Random random;
 
-    public ExerciceService(ExerciceRepository exerciceRepository, PresenceRepository presenceRepository, Random random) {
+    public ExerciceService(ExerciceRepository exerciceRepository, PresenceRepository presenceRepository,
+                            RelectureRepository relectureRepository, Random random) {
         this.exerciceRepository = exerciceRepository;
         this.presenceRepository = presenceRepository;
+        this.relectureRepository = relectureRepository;
         this.random = random;
     }
 
@@ -47,6 +53,23 @@ public class ExerciceService {
         // candidats valides, sinon mise en file d'attente").
 
         return exerciceRepository.save(exercice);
+    }
+
+    /** EF5 : l'etudiant consulte ses propres exercices et, s'ils sont evalues, sa note. */
+    @Transactional(readOnly = true)
+    public List<MonExerciceResponse> mesExercices(Long etudiantId) {
+        return exerciceRepository.findByAuteurId(etudiantId).stream()
+                .map(exercice -> {
+                    Relecture relecture = relectureRepository.findByExerciceId(exercice.getId()).orElse(null);
+                    return new MonExerciceResponse(
+                            exercice.getId(),
+                            exercice.getLien(),
+                            exercice.getStatut().name(),
+                            relecture != null ? relecture.getNote() : null,
+                            relecture != null ? relecture.getCommentaire() : null
+                    );
+                })
+                .toList();
     }
 
     private void validerLien(String lien) {

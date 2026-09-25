@@ -111,3 +111,15 @@ pour vérifier RG3 sans authentification. Voir CAHIER_DES_CHARGES.md §7.*
 - Permet la saisie d'une note (0-20) et d'un commentaire.
 - Gère les cas d'erreur de relecture (ex: déjà soumis).
 **Réf :** F2, F3
+
+## 12. API : Consulter ses propres exercices et notes
+**Priorité :** Must
+**Description :** Créer l'endpoint `GET /api/exercices?etudiantId=`.
+**Critères d'acceptation :**
+- Retourne `{id, lien, statut, note, commentaire}` par exercice de l'étudiant.
+- `note`/`commentaire` null tant que non évalué.
+- Ne renvoie jamais `relecteurId` (RG10).
+**Réf :** EF5, RG10, B2
+
+*Ajouté a posteriori (25/09, issue #26) : EF5 n'avait aucun endpoint, repéré
+en relisant `EcranEtudiant.tsx` (placeholder statique).*

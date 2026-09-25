@@ -4,8 +4,12 @@ import com.kfokam48.presencerelecture.domain.Relecture;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import java.util.Optional;
+
 public interface RelectureRepository extends JpaRepository<Relecture, Long> {
     boolean existsByExerciceId(Long exerciceId);
+
+    Optional<Relecture> findByExerciceId(Long exerciceId);
 
     /** Moyenne des notes recues par un etudiant sur les exercices dont il est l'auteur. */
     @Query("select avg(r.note) from Relecture r, Exercice e where e.id = r.exerciceId and e.auteurId = :auteurId")
