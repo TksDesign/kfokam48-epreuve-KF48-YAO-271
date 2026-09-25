@@ -118,10 +118,10 @@ export const api = {
     }),
 
   // --- Relectures ---
-  rendreRelecture: (exerciceId: number, note: number, commentaire: string) =>
+  rendreRelecture: (exerciceId: number, note: number, commentaire: string, relecteurId: number) =>
     fetchApi<void>(`/relectures/${exerciceId}`, {
       method: 'POST',
-      body: JSON.stringify({ note, commentaire }),
+      body: JSON.stringify({ note, commentaire, relecteurId }),
     }),
 
   // --- Tableau ---
